@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redeem Kode</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --panel: #131316;
+    --panel-border: #232327;
+    --text: #ededf0;
+    --text-dim: #8b8b93;
+    --accent: #d4a24e;
+    --accent-soft: rgba(212, 162, 78, 0.14);
+    --error: #e2574c;
+    --success: #4caf7d;
+    --radius: 14px;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg);
+    font-family: var(--font);
+    color: var(--text);
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(212, 162, 78, 0.06), transparent 40%),
+      radial-gradient(circle at 80% 85%, rgba(212, 162, 78, 0.04), transparent 45%);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.6;
+  }
+
+  .mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    border: 1px solid rgba(212, 162, 78, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .mark svg { width: 20px; height: 20px; stroke: var(--accent); }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin: 0 0 28px;
+    line-height: 1.5;
+  }
+
+  form { display: flex; flex-direction: column; gap: 14px; }
+
+  label {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: -6px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    background: #0e0e11;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-size: 15px;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  input[type="text"]::placeholder {
+    color: #55555c;
+    font-family: var(--font);
+    letter-spacing: normal;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+
+  input[type="text"].invalid {
+    border-color: var(--error);
+  }
+
+  button {
+    margin-top: 6px;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #17130a;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.1s ease;
+  }
+
+  button:hover:not(:disabled) { filter: brightness(1.08); }
+  button:active:not(:disabled) { transform: scale(0.98); }
+
+  button:disabled {
+    background: #2a2a2e;
+    color: #6b6b72;
+    cursor: not-allowed;
+  }
+
+  .message {
+    font-size: 13.5px;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .message.error { color: var(--error); }
+  .message.hint { color: var(--text-dim); }
+
+  /* ---- Success screen ---- */
+  .success-view {
+    display: none;
+    text-align: center;
+    animation: rise 0.4s ease;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .success-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: rgba(76, 175, 125, 0.12);
+    border: 1px solid rgba(76, 175, 125, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .success-icon svg {
+    width: 26px; height: 26px;
+    stroke: var(--success);
+  }
+
+  .success-view h2 {
+    font-size: 19px;
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+
+  .success-view p {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
+
+  .code-chip {
+    display: inline-block;
+    background: #0e0e11;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    margin-bottom: 24px;
+  }
+
+  .ghost-btn {
+    background: transparent;
+    border: 1px solid var(--panel-border);
+    color: var(--text);
+    width: 100%;
+  }
+
+  .ghost-btn:hover { border-color: var(--accent); }
+
+  .spinner {
+    width: 15px; height: 15px;
+    border: 2px solid rgba(23,19,10,0.25);
+    border-top-color: #17130a;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .btn-content {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- FORM VIEW -->
+  <div id="formView">
+    <div class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.24L4 3a1 1 0 0 0-1 1l.24 5.59a2 2 0 0 0 .59 1.41l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83Z"/>
+        <circle cx="7.5" cy="7.5" r="1.2" fill="var(--accent)" stroke="none"/>
+      </svg>
+    </div>
+    <h1>Redeem kode</h1>
+    <p class="subtitle">Masukkan kode yang kamu punya untuk mengaktifkannya.</p>
+
+    <form id="redeemForm">
+      <label for="codeInput">Kode redeem</label>
+      <input
+        type="text"
+        id="codeInput"
+        placeholder="cth. ABCD-1234-EFGH"
+        autocomplete="off"
+        spellcheck="false"
+        required
+      >
+      <div class="message" id="formMessage"></div>
+      <button type="submit" id="submitBtn">
+        <span class="btn-content" id="submitBtnContent">Redeem</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- SUCCESS VIEW -->
+  <div class="success-view" id="successView">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6 9 17l-5-5"/>
+      </svg>
+    </div>
+    <h2>Berhasil di-redeem</h2>
+    <p>Kodenya sudah aktif dan tersambung ke akunmu.</p>
+    <div class="code-chip" id="redeemedCodeChip"></div>
+    <button class="ghost-btn" id="redeemAnotherBtn">Redeem kode lain</button>
+  </div>
+
+</div>
+
+<script>
+  // ============================================================
+  // KONFIGURASI — sesuaikan dengan endpoint API kamu
+  // ============================================================
+  const REDEEM_ENDPOINT = "https://api-shopmanager.vercel.app/api/redeem"; // ganti ke URL API Flask kamu
+  const API_KEY = "GANTI_DENGAN_API_KEY_KAMU"; // idealnya jangan hardcode di produksi,
+                                                 // pertimbangkan proxy server-side kalau
+                                                 // key ini sensitif
+
+  const form = document.getElementById("redeemForm");
+  const input = document.getElementById("codeInput");
+  const messageEl = document.getElementById("formMessage");
+  const submitBtn = document.getElementById("submitBtn");
+  const submitBtnContent = document.getElementById("submitBtnContent");
+
+  const formView = document.getElementById("formView");
+  const successView = document.getElementById("successView");
+  const redeemedCodeChip = document.getElementById("redeemedCodeChip");
+  const redeemAnotherBtn = document.getElementById("redeemAnotherBtn");
+
+  function setLoading(isLoading) {
+    submitBtn.disabled = isLoading;
+    submitBtnContent.innerHTML = isLoading
+      ? '<span class="spinner"></span> Memproses...'
+      : "Redeem";
+  }
+
+  function showError(text) {
+    input.classList.add("invalid");
+    messageEl.className = "message error";
+    messageEl.textContent = text;
+  }
+
+  function clearError() {
+    input.classList.remove("invalid");
+    messageEl.className = "message";
+    messageEl.textContent = "";
+  }
+
+  input.addEventListener("input", clearError);
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearError();
+
+    const code = input.value.trim();
+    if (!code) {
+      showError("Masukkan kode terlebih dahulu.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch(REDEEM_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY,
+        },
+        body: JSON.stringify({ code }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        showError(data.message || "Kode redeem tidak valid.");
+        setLoading(false);
+        return;
+      }
+
+      // Sukses -> tampilkan success view
+      redeemedCodeChip.textContent = code.toUpperCase();
+      formView.style.display = "none";
+      successView.style.display = "block";
+
+    } catch (err) {
+      showError("Gagal terhubung ke server. Coba lagi.");
+      setLoading(false);
+    }
+  });
+
+  redeemAnotherBtn.addEventListener("click", () => {
+    input.value = "";
+    clearError();
+    setLoading(false);
+    successView.style.display = "none";
+    formView.style.display = "block";
+    input.focus();
+  });
+</script>
+
+</body>
+</html>
